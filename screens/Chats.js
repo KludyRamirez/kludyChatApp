@@ -1,47 +1,33 @@
-import { View, Text } from "react-native";
+import { collection, onSnapshot, query, where } from "@firebase/firestore";
 import React, { useContext, useEffect } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { View } from "react-native";
 import Context from "../context/Context";
+import { auth, db } from "../firebase";
 import ContactsFloatingIcon from "../components/ContactsFloatingIcon";
 import ListItem from "../components/ListItem";
 import useContacts from "../hooks/useHooks";
-
 export default function Chats() {
   const { currentUser } = auth;
-
   const { rooms, setRooms } = useContext(Context);
-
   const contacts = useContacts();
-
-  // 2nd mvvm architechture - una, ni get ko yung collection ng rooms kung saan present yung currentUser.email sa field
-  //  tas nilagay ko sa chatsQuery
-  // visualization
-
-  // participantsArray = [ currentUser.email, userB, userC ]
-
   const chatsQuery = query(
     collection(db, "rooms"),
     where("participantsArray", "array-contains", currentUser.email)
   );
-
   useEffect(() => {
     const unsubscribe = onSnapshot(chatsQuery, (querySnapshot) => {
-      const parsedChats = querySnapshot.docs
-        .filter((doc) => doc.data().lastMessage)
-        .map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-          userB: doc
-            .data()
-            .participants.find((p) => p.email !== currentUser.email),
-        }));
-      setRooms(parsedChats);
+      const parsedChats = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        userB: doc
+          .data()
+          .participants.find((p) => p.email !== currentUser.email),
+      }));
+      // setUnfilteredRooms(parsedChats);
+      setRooms(parsedChats.filter((doc) => doc.lastMessage));
     });
     return () => unsubscribe();
   }, []);
-
-  // end of 2nd mvvm
 
   function getUserB(user, contacts) {
     const userContact = contacts.find((c) => c.email === user.email);
@@ -52,7 +38,7 @@ export default function Chats() {
   }
 
   return (
-    <View className="flex flex-grow p-2">
+    <View style={{ flex: 1, padding: 5, paddingRight: 10 }}>
       {rooms.map((room) => (
         <ListItem
           type="chat"

@@ -6,8 +6,8 @@ export default function Avatar({ size, user }) {
     <Image
       style={{ width: size, height: size, borderRadius: size }}
       source={
-        user.photoURL
-          ? { uri: user.photoURL }
+        user?.photoURL
+          ? { uri: user?.photoURL }
           : require("../assets/icon-square.png")
       }
       resizeMode="cover"

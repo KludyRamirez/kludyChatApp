@@ -1,16 +1,25 @@
 // @refresh reset
-import { View, Text } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Text, ImageBackground } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { useRoute } from "@react-navigation/native";
 import "react-native-get-random-values";
 import { nanoid } from "nanoid";
-import { collection, doc, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { GiftedChat } from "react-native-gifted-chat";
 
 const randomId = nanoid();
 
 export default function Chat() {
   const [roomHash, setRoomHash] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const { currentUser } = auth;
   const route = useRoute();
@@ -45,7 +54,7 @@ export default function Chat() {
         }
         const userBData = {
           displayName: userB.contactName || userB.displayName || "",
-          email: currentUser.email,
+          email: userB.email,
         };
         if (userB.photoURL) {
           userBData.photoURL = userB.photoURL;
@@ -62,6 +71,9 @@ export default function Chat() {
       }
       const emailHash = `${currentUser.email}:${userB.email}`;
       setRoomHash(emailHash);
+      // if (selectedImage && selectedImage.uri) {
+      //   await sendImage(selectedImage.uri, emailHash);
+      // }
     })();
   }, []);
 
@@ -69,13 +81,45 @@ export default function Chat() {
     const unsubscribe = onSnapshot(roomMessagesRef, (querySnapshot) => {
       const messagesFirestore = querySnapshot
         .docChanges()
-        .filter(({ type }) => type === "added");
+        .filter(({ type }) => type === "added")
+        .map(({ doc }) => {
+          const message = doc.data();
+          return { ...message, createdAt: message.createdAt.toDate() };
+        })
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      appendMessages(messagesFirestore);
     });
+    return () => unsubscribe();
   }, []);
 
+  const appendMessages = useCallback(
+    (messages) => {
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, messages)
+      );
+    },
+    [messages]
+  );
+
+  async function onSend(messages = []) {
+    const writes = messages.map((m) => addDoc(roomMessagesRef, m));
+    const lastMessage = messages[messages.length - 1];
+    writes.push(updateDoc(roomRef, { lastMessage }));
+    await Promise.all(writes);
+  }
+
   return (
-    <View>
-      <Text>Chat</Text>
-    </View>
+    <ImageBackground
+      resizeMode="cover"
+      source={require("../assets/chatbg.png")}
+      className="flex-grow"
+    >
+      <GiftedChat
+        onSend={onSend}
+        messages={messages}
+        user={senderUser}
+        renderAvatar={null}
+      />
+    </ImageBackground>
   );
 }

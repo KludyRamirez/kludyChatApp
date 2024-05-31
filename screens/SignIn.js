@@ -27,13 +27,13 @@ export default function SignIn() {
       />
       <View className="mt-20">
         <TextInput
-          value={email.value}
+          value={email}
           onChangeText={(text) => setEmail(text)}
           placeholder="Email"
           className="border-b-[1px] border-[#606060] w-[200px] px-2"
         />
         <TextInput
-          value={password.value}
+          value={password}
           onChangeText={(text) => setPassword(text)}
           placeholder="Password"
           secureTextEntry={true}

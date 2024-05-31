@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text } from "react-native";
+import { LogBox, Text } from "react-native";
 import { useAssets } from "expo-asset";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -15,6 +15,10 @@ import { Ionicons } from "@expo/vector-icons";
 import Contacts from "./screens/Contacts";
 import ChatHeader from "./components/ChatHeader";
 import Chat from "./screens/Chat";
+LogBox.ignoreLogs([
+  "Setting a timer",
+  "AsyncStorage has been extracted from react-native core and will be removed in a future release.",
+]);
 
 const Stack = createStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -81,7 +85,6 @@ function App() {
     </NavigationContainer>
   );
 }
-
 function Home() {
   return (
     <Tab.Navigator

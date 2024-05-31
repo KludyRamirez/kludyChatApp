@@ -32,7 +32,7 @@ export default function Profile() {
     const user = auth.currentUser;
     let photoURL;
     if (selectedImage) {
-      const url = await uploadImage(
+      const { url } = await uploadImage(
         selectedImage,
         `images/${user.uid}`,
         "profilePicture"
@@ -44,9 +44,9 @@ export default function Profile() {
       email: user.email,
     };
     if (photoURL) {
-      userData.photoURL = photoURL.url;
-      userData.fileName = photoURL.fileName;
+      userData.photoURL = photoURL;
     }
+
     await Promise.all([
       updateProfile(user, userData),
       setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),

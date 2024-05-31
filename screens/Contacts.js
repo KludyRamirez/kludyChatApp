@@ -1,20 +1,19 @@
-import { FlatList } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
-import useContacts from "../hooks/useHooks";
-import Context from "../context/Context";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import ListItem from "../components/ListItem";
+import { collection, onSnapshot, query, where } from "@firebase/firestore";
 import { useRoute } from "@react-navigation/native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, FlatList } from "react-native";
+import ListItem from "../components/ListItem";
+import Context from "../context/Context";
 import { db } from "../firebase";
+import useContacts from "../hooks/useHooks";
 
 export default function Contacts() {
   const contacts = useContacts();
   const route = useRoute();
   const image = route.params && route.params.image;
-
   return (
     <FlatList
-      className="flex flex-grow p-[10px]"
+      style={{ flex: 1, padding: 10 }}
       data={contacts}
       keyExtractor={(_, i) => i}
       renderItem={({ item }) => <ContactPreview contact={item} image={image} />}
@@ -22,11 +21,10 @@ export default function Contacts() {
   );
 }
 
-// 3rd mvvm
-
 function ContactPreview({ contact, image }) {
   const { rooms } = useContext(Context);
   const [user, setUser] = useState(contact);
+
   useEffect(() => {
     const q = query(
       collection(db, "users"),
@@ -40,10 +38,9 @@ function ContactPreview({ contact, image }) {
     });
     return () => unsubscribe();
   }, []);
-
   return (
     <ListItem
-      className="mt-[7px]"
+      style={{ marginTop: 7 }}
       type="contacts"
       user={user}
       image={image}
