@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Contacts from "./screens/Contacts";
 import ChatHeader from "./components/ChatHeader";
 import Chat from "./screens/Chat";
+
 LogBox.ignoreLogs([
   "Setting a timer",
   "AsyncStorage has been extracted from react-native core and will be removed in a future release.",
@@ -85,6 +86,7 @@ function App() {
     </NavigationContainer>
   );
 }
+
 function Home() {
   return (
     <Tab.Navigator

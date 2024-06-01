@@ -22,7 +22,7 @@ export default function Contacts() {
 }
 
 function ContactPreview({ contact, image }) {
-  const { rooms } = useContext(Context);
+  const { unfilteredRooms } = useContext(Context);
   const [user, setUser] = useState(contact);
 
   useEffect(() => {
@@ -38,13 +38,14 @@ function ContactPreview({ contact, image }) {
     });
     return () => unsubscribe();
   }, []);
+
   return (
     <ListItem
       style={{ marginTop: 7 }}
       type="contacts"
       user={user}
       image={image}
-      room={rooms.find((room) =>
+      room={unfilteredRooms.find((room) =>
         room.participantsArray.includes(contact.email)
       )}
     />

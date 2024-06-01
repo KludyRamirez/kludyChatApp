@@ -6,14 +6,18 @@ import { auth, db } from "../firebase";
 import ContactsFloatingIcon from "../components/ContactsFloatingIcon";
 import ListItem from "../components/ListItem";
 import useContacts from "../hooks/useHooks";
+
 export default function Chats() {
   const { currentUser } = auth;
-  const { rooms, setRooms } = useContext(Context);
+  const { rooms, setRooms, unfilteredRooms, setUnfilteredRooms } =
+    useContext(Context);
   const contacts = useContacts();
+
   const chatsQuery = query(
     collection(db, "rooms"),
     where("participantsArray", "array-contains", currentUser.email)
   );
+
   useEffect(() => {
     const unsubscribe = onSnapshot(chatsQuery, (querySnapshot) => {
       const parsedChats = querySnapshot.docs.map((doc) => ({
@@ -23,7 +27,7 @@ export default function Chats() {
           .data()
           .participants.find((p) => p.email !== currentUser.email),
       }));
-      // setUnfilteredRooms(parsedChats);
+      setUnfilteredRooms(parsedChats);
       setRooms(parsedChats.filter((doc) => doc.lastMessage));
     });
     return () => unsubscribe();
