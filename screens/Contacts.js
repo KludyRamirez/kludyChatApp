@@ -1,7 +1,7 @@
 import { collection, onSnapshot, query, where } from "@firebase/firestore";
 import { useRoute } from "@react-navigation/native";
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import ListItem from "../components/ListItem";
 import Context from "../context/Context";
 import { db } from "../firebase";

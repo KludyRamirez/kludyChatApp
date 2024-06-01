@@ -36,7 +36,6 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageView, setSelectedImageView] = useState("");
-  const [inputText, setInputText] = useState(null);
 
   const { currentUser } = auth;
   const route = useRoute();
